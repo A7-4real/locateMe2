@@ -100,6 +100,101 @@ async function initialize() {
   map.setStreetView(panorama);
 }
 
+function setMapsOnAll(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+function clearMarkers() {
+  setMapsOnAll(null);
+}
+
+function showMarkers() {
+  setMapsOnAll(map);
+}
+
+function deleteMarkers() {
+  clearMarkers();
+  markers = [];
+}
+
+function check() {
+  enalbleButton("next");
+  distance_from_guess = [];
+  var guess_error = distance(
+    guess_coordinates[0],
+    guess_coordinates[1],
+    true_location[0],
+    true_location[1],
+    "K"
+  );
+  accumulated_distance += parseFloat(guess_error);
+  distance_form_guess = guess_error;
+
+  console.log("Guessed Location: " + guess_coordinates);
+  console.log("Actual Location: " + true_location);
+  console.log("Current guess error: " + guess_error);
+  console.log("total guess error: " + accumulated_distance);
+
+  var true_coords = { lat: true_location[0], lng: true_location[1] };
+  var guess_coords = { lat: guess_coordinates[0], lng: guess_coordinates[1] };
+  var result_map = new google.maps.Maps(document.getElementById("result"), {
+    zoom: 2,
+    center: true_coords,
+  });
+
+  var true_marker = new google.maps.Marker({
+    position: true_coords,
+    map: result_map,
+    title: "True Location",
+    icon: {
+      url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+    },
+  });
+
+  var infoWindow = new google.maps.InfoWindow({
+    content: current_name,
+  });
+
+  true_marker.addEventListener("click", function () {
+    infoWindow.open(result_map, true_marker);
+  });
+
+  var guess_marker = new google.maps.Marker({
+    postion: guess_coords,
+    map: result_map,
+    title: "Guessing Location",
+    icon: {
+      url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+    },
+  });
+
+  var flightPlanCoordinates = [true_coords, guess_coords];
+
+  var lineSymbol = {
+    path: "M 0, -1 0, 1",
+    strokeOpacity: 1,
+    scale: 2,
+  };
+
+  var flightPath = new google.maps.Polyline({
+    path: flightPlanCoordinates,
+    strokeOpacity: 0,
+    icons: [
+      {
+        icon: lineSymbol,
+        offset: "1",
+        repeat: "15px",
+      },
+    ],
+  });
+
+  flightPath.setMap(result_map);
+  display_location();
+  disableButton("check");
+}
+
 var index = -1;
 function randomLoc() {
   index += 1;
