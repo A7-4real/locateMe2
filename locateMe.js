@@ -67,7 +67,7 @@ async function initialize() {
   google.maps.event.addEventListener(map, "click", function (event) {
     PlaceMarker(event.latLng);
     if (check_count == 0) {
-      enableButtong("chekc");
+      enableButtong("check");
       check_count += 1;
     }
   });
